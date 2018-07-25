@@ -6,7 +6,12 @@
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
+<<<<<<< HEAD
+*	use, modify, or share the software for any purpose
+*	other than personal use.
+=======
 *	use, modify, or share the software for any purpose.
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
 
@@ -118,6 +123,24 @@ bool MCP7940n::i2cRead(uint8_t address, uint8_t& data)
 /*
 bool MCP7940n::i2cWriteConcecutive(uint8_t address, uint8_t data1, uint8_t data2, uint8_t data3)
 {
+<<<<<<< HEAD
+BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
+bool valid = true;
+_delay_loop_1(2);
+valid &= i2cWriteLoop(ADR_WRITE);
+valid &= i2cWriteLoop(address);
+valid &= i2cWriteLoop(data1);
+valid &= i2cWriteLoop(data2);
+valid &= i2cWriteLoop(data3);
+BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
+_delay_loop_1(2);
+BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
+_delay_loop_1(2);
+BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
+_delay_loop_1(2);
+BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // Stop Bit
+return valid;
+=======
 	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
 	bool valid = true;
 	_delay_loop_1(2);
@@ -134,10 +157,32 @@ bool MCP7940n::i2cWriteConcecutive(uint8_t address, uint8_t data1, uint8_t data2
 	_delay_loop_1(2);
 	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // Stop Bit
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 
 bool MCP7940n::i2cReadConcecutive(uint8_t address, uint8_t& data1, uint8_t& data2, uint8_t& data3)
 {
+<<<<<<< HEAD
+data1 = 0;
+data2 = 0;
+data3 = 0;
+bool valid = true;
+valid &= i2cWrite(address, 0xff);
+_delay_loop_1(2);
+BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
+valid &= i2cWriteLoop(ADR_READ);
+i2cReadLoop(data1, true);
+i2cReadLoop(data2, true);
+i2cReadLoop(data3, false);
+BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
+_delay_loop_1(2);
+BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
+_delay_loop_1(2);
+BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
+_delay_loop_1(2);
+BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); //Stop Bit
+return valid;
+=======
 	data1 = 0;
 	data2 = 0;
 	data3 = 0;
@@ -157,6 +202,7 @@ bool MCP7940n::i2cReadConcecutive(uint8_t address, uint8_t& data1, uint8_t& data
 	_delay_loop_1(2);
 	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); //Stop Bit
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 */
 inline bool MCP7940n::i2cReadRoutine(uint8_t address, int8_t& data)
@@ -188,56 +234,104 @@ inline bool MCP7940n::i2cWriteRoutine(uint8_t address, int8_t data)
 /*
 bool MCP7940n::loadSec()
 {
+<<<<<<< HEAD
+bool valid = true;
+cli();
+valid &= i2cReadRoutine(RTCSEC, secs);
+sei();
+return valid;
+=======
 	bool valid = true;
 	cli();
 	valid &= i2cReadRoutine(RTCSEC, secs);
 	sei();
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 
 bool MCP7940n::loadMin()
 {
+<<<<<<< HEAD
+bool valid = true;
+cli();
+valid &= i2cReadRoutine(RTCMIN, mins);
+sei();
+return valid;
+=======
 	bool valid = true;
 	cli();
 	valid &= i2cReadRoutine(RTCMIN, mins);
 	sei();
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 
 bool MCP7940n::loadHour()
 {
+<<<<<<< HEAD
+bool valid = true;
+cli();
+valid &= i2cReadRoutine(RTCHOUR, hours);
+sei();
+return valid;
+=======
 	bool valid = true;
 	cli();
 	valid &= i2cReadRoutine(RTCHOUR, hours);
 	sei();
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 
 bool MCP7940n::saveSec()
 {
+<<<<<<< HEAD
+bool valid = true;
+cli();
+valid &= i2cWriteRoutine(RTCSEC, secs);
+sei();
+return valid;
+=======
 	bool valid = true;
 	cli();
 	valid &= i2cWriteRoutine(RTCSEC, secs);
 	sei();
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 
 bool MCP7940n::saveMin()
 {
+<<<<<<< HEAD
+bool valid = true;
+cli();
+valid &= i2cWriteRoutine(RTCMIN, mins);
+sei();
+return valid;
+=======
 	bool valid = true;
 	cli();
 	valid &= i2cWriteRoutine(RTCMIN, mins);
 	sei();
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 
 bool MCP7940n::saveHour()
 {
+<<<<<<< HEAD
+bool valid = true;
+cli();
+valid &= i2cWriteRoutine(RTCHOUR, hours);
+sei();
+return valid;
+=======
 	bool valid = true;
 	cli();
 	valid &= i2cWriteRoutine(RTCHOUR, hours);
 	sei();
 	return valid;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 */
 bool MCP7940n::loadTime()

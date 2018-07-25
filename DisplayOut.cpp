@@ -6,7 +6,12 @@
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
+<<<<<<< HEAD
+*	use, modify, or share the software for any purpose
+*	other than personal use.
+=======
 *	use, modify, or share the software for any purpose.
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
 
@@ -87,7 +92,11 @@ uint16_t min10Data[5] =
 	0b0000100010000000//5
 };
 
+<<<<<<< HEAD
+uint16_t heartData[2] =
+=======
 uint16_t heartData[2] = 
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 {
 	0b0000000101000000,
 	0b0001000101010101
@@ -241,11 +250,19 @@ void DisplayOut::setDisplay(ClockWorks& clockObj)
 
 void DisplayOut::setDisplayBin(ClockWorks& clockObj)
 {
+<<<<<<< HEAD
+	screenBuffer[0] = clockObj.getHour()&0x1F;
+	screenBuffer[0] |= ((clockObj.getMin()/10)&0x1F)<<5;
+	screenBuffer[1] = ((clockObj.getMin()%10)&0x1F);
+	screenBuffer[1] |= ((clockObj.getSec()/10)&0x1F)<<5;
+	screenBuffer[1] |= ((clockObj.getSec()%10)&0x1F)<<10;
+=======
 screenBuffer[0] = clockObj.getHour()&0x1F;
 screenBuffer[0] |= ((clockObj.getMin()/10)&0x1F)<<5;
 screenBuffer[1] = ((clockObj.getMin()%10)&0x1F);
 screenBuffer[1] |= ((clockObj.getSec()/10)&0x1F)<<5;
 screenBuffer[1] |= ((clockObj.getSec()%10)&0x1F)<<10;
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 }
 
 void DisplayOut::setDisplayHeart()

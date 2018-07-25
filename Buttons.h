@@ -6,7 +6,12 @@
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
+<<<<<<< HEAD
+*	use, modify, or share the software for any purpose
+*	other than personal use.
+=======
 *	use, modify, or share the software for any purpose.
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
 #ifndef _BUTTONS_CAKENG_H
@@ -23,7 +28,11 @@
 #define BUTTON_UNDER_TICKS		7
 #define NULL 0
 
+<<<<<<< HEAD
+#ifndef	BUTTON_INPUT_UP
+=======
 #ifndef	BUTTON_INPUT_UP   
+>>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 #define BUTTON_INPUT_UP                PINA5
 #define BUTTON_INPUT_DOWN			PINA6
 #define BUTTON_INPUT_ALARM			PINA7
