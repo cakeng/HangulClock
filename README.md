@@ -1,9 +1,9 @@
-	ÇÑ±Û½Ã°è design based on attiny44a.
+	Ã‡Ã‘Â±Ã›Â½ÃƒÂ°Ã¨ design based on attiny44a.
 	2018. 6. 28 ~ 2018. 7. 24
 
-	Software, schemetic, PCB file created by PARK JONG SEOK (¹ÚÁ¾¼®)
+	Software, schemetic, PCB file created by PARK JONG SEOK (Â¹ÃšÃÂ¾Â¼Â®)
 
-	Case CAD file Created by Choi Yun Shick (ÃÖÀ±½Ä) 
+	Case CAD file Created by Choi Yun Shick (ÃƒÃ–Ã€Â±Â½Ã„) 
 
 	NO LICENCE INCLUDED
 	Contact cakeng@naver.com to
