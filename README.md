@@ -1,9 +1,9 @@
-	ÇÑ±Û½Ã°è design based on attiny44a.
+	 한글시계 design based on attiny44a.
 	2018. 6. 28 ~ 2018. 7. 24
 
-	Software, schemetic, PCB file created by PARK JONG SEOK (¹ÚÁ¾¼®)
+	Software, schemetic, PCB file created by PARK JONG SEOK (박종석)
 
-	Case CAD file Created by Choi Yun Shick (ÃÖÀ±½Ä) 
+	Case CAD file Created by Choi Yun Shick (최윤식) 
 
 	NO LICENCE INCLUDED
 	Contact cakeng@naver.com to
