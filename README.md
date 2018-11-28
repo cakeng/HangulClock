@@ -11,3 +11,8 @@
 	other than personal use.
 
 	
+	
+	//EDIT
+	The project is being updated to the newly released Attiny816 version as of 2018.11.28.
+	The current PCB file is using Attiny4313, and the codes are based on the Attiny44.
+	
