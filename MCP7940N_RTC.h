@@ -2,19 +2,17 @@
 *	MCP7940N_RTC.h
 *
 *	Created: 2018-07-13 오후 8:40:18
+*	Modified 2018-11-19 for Attiny 4313
 *	Author: Cakeng (PARK JONG SEOK)
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
-<<<<<<< HEAD
 *	use, modify, or share the software for any purpose
 *	other than personal use.
-=======
-*	use, modify, or share the software for any purpose.
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
-#define  F_CPU 8000000
+
+#define  F_CPU 16000000
 #ifndef MCP7940N_RTC_CAKENG_H
 #define MCP7940N_RTC_CAKENG_H
 
@@ -29,8 +27,9 @@
 #define ADR_READ  (0b11011111)
 
 /* For DS1307...*/
-#define ADR_WRITE_1307 (0b11010000)
-#define ADR_READ_1307  (0b11010001)
+/*
+#define ADR_WRITE (0b11010000)
+#define ADR_READ (0b11010001)*/
 
 #define RTCSEC    (0x00)
 #define RTCMIN    (0x01)
@@ -40,32 +39,37 @@
 #define RTCMTH    (0x05)
 #define RTCYEAR   (0x06)
 
-#ifndef	I2C_PORT_GROUP
-#define I2C_PORT_GROUP			PORTB
-#define I2C_DATA_GROUP			DDRB
-#define  I2C_INPUT_GROUP			PINB
-#define I2C_CLOCK_PIN	PORTB0
-#define I2C_DATA_PIN	PORTB1
-#endif
-
 class MCP7940n : public ClockWorks
 {
 	private:
-	bool i2cWriteLoop(uint8_t data);
-	void i2cReadLoop(uint8_t& data, bool ack);
-	bool i2cWrite(uint8_t address, uint8_t data);
-	bool i2cRead(uint8_t address, uint8_t& data);
-	/*
-	bool i2cReadConcecutive(uint8_t address, uint8_t& data1, uint8_t& data2, uint8_t& data3);
-	bool i2cWriteConcecutive(uint8_t address, uint8_t data1, uint8_t data2, uint8_t data3);
-	*/
 	
-	inline bool i2cReadRoutine(uint8_t address, int8_t& data);
-	inline bool i2cWriteRoutine(uint8_t address, int8_t data);
+	inline void i2cRead(uint8_t address, uint8_t& data);
 
-	int dec2bcd(uint8_t dec)
+	inline void i2cWrite(uint8_t address, uint8_t data);
+	
+	inline void i2cStart();
+	
+	inline void i2cEnd();
+	
+	inline void i2cSend(uint8_t data);
+	
+	inline uint8_t i2cRecive();
+	
+	inline void i2cAck();
+	
+	inline void i2cAck(bool b);
+	
+	void rtcReadRoutine(uint8_t address, int8_t& data);
+	
+	void rtcWriteRoutine(uint8_t address, int8_t data);
+	
+	void rtcReadRoutineAll(int8_t& h,int8_t& m,int8_t& s);
+
+
+	uint8_t dec2bcd(int8_t dec)
 	{
-		return ((dec%10)&0x0f)|((dec/10)<<4);
+		uint8_t temp = (uint8_t) dec;
+		return ((temp%10)&0x0f)|((temp/10)<<4);
 	}
 	
 	int bcd2dec(uint8_t bcd)
@@ -82,8 +86,19 @@ class MCP7940n : public ClockWorks
 	bool saveMin();
 	bool saveHour();
 	*/
-	bool loadTime();
-	bool saveTime();
+	void loadTime();
+	void saveTime(bool secT);
+	void saveTime();
+
+	void enableOscillator()
+	{
+		i2cWrite(RTCSEC, (secs|0x80));
+	}
+
+	void enableBattery()
+	{
+		i2cWrite(RTCWKDAY, 0x08);
+	}
 
 	MCP7940n();
 

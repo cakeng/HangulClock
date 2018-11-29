@@ -2,16 +2,13 @@
 *	ClockWorks.cpp
 *
 *	Created: 2018-06-28 ¿ÀÀü 6:36:52
+*	Modified 2018-11-19 for Attiny 4313
 *	Author: Cakeng (PARK JONG SEOK)
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
-<<<<<<< HEAD
 *	use, modify, or share the software for any purpose
 *	other than personal use.
-=======
-*	use, modify, or share the software for any purpose.
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
 
@@ -72,13 +69,4 @@ void ClockWorks::getTime(uint8_t& h, uint8_t& m, uint8_t& s)
 	s = secs;
 }
 
-void ClockWorks::autoRoutine()
-{
-	if(timeTicks > timeTicksConstant)
-	{
-		secs++;
-		timeTicks -= timeTicksConstant;
-		clockKeeping();
-	}
-}
 

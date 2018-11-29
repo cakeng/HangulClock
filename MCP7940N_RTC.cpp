@@ -2,368 +2,220 @@
 *	MCP7940N_RTC.cpp
 *
 *	Created: 2018-07-13 오후 8:40:18
+*	Modified 2018-11-19 for Attiny 4313
 *	Author: Cakeng (PARK JONG SEOK)
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
-<<<<<<< HEAD
 *	use, modify, or share the software for any purpose
 *	other than personal use.
-=======
-*	use, modify, or share the software for any purpose.
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
 
 #include "MCP7940N_RTC.h"
 
-
-bool MCP7940n::i2cWriteLoop(uint8_t data)
+inline void MCP7940n::i2cWrite(uint8_t address, uint8_t data)
 {
-	_delay_loop_1(2);
-	for(uint8_t i = 0; i < 8; i++)
-	{
-		BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		if((data<<i)&0x80)
-		{
-			BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN);
-		}
-		else
-		{
-			BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
-		}
-		_delay_loop_1(2);
-		BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		_delay_loop_1(2);
-	}
-	BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-	_delay_loop_1(2);
-	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // SDA Line released
-	_delay_loop_1(2);
-	BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-	_delay_loop_1(2);
-	return BIT_CHECK(PINB, I2C_DATA_PIN);
+	i2cStart();
+	i2cSend(ADR_WRITE);
+	i2cAck();
+	i2cSend(address);
+	i2cAck();
+	i2cSend(data);
+	i2cAck();
+	i2cEnd();
 }
 
-void MCP7940n::i2cReadLoop(uint8_t& data, bool ack)
+inline void MCP7940n::i2cRead(uint8_t address, uint8_t& data)
 {
-	data = 0;
-	_delay_loop_1(2);
-	for(uint8_t i = 0; i < 8; i++)
-	{
-		BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		_delay_loop_1(2);
-		BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		if(BIT_CHECK(I2C_INPUT_GROUP, I2C_DATA_PIN))
-		{
-			data |= (0x80>>i);
-		}
-		_delay_loop_1(2);
-	}
-	if(ack)
-	{
-		BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		_delay_loop_1(2);
-		BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Acknowledge Bit
-		_delay_loop_1(2);
-		BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		_delay_loop_1(2);
-	}
-	else
-	{
-		BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		_delay_loop_1(2);
-		BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // NOT Acknowledge Bit
-		_delay_loop_1(2);
-		BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-		_delay_loop_1(2);
-	}
+	i2cStart();
+	i2cSend(ADR_WRITE);
+	i2cAck();
+	i2cSend(address);
+	i2cAck();
+	i2cEnd();
+	
+	i2cStart();
+	i2cSend(ADR_READ);
+	i2cAck();
+	data = i2cRecive();
+	i2cAck();
+	i2cEnd();
 }
 
-bool MCP7940n::i2cWrite(uint8_t address, uint8_t data)
+
+
+inline void MCP7940n::i2cSend(uint8_t data)
 {
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
-	bool valid = true;
-	_delay_loop_1(2);
-	valid &= i2cWriteLoop(ADR_WRITE);
-	_delay_loop_1(2);
-	valid &= i2cWriteLoop(address);
-	if(data!=0xff)
+	USIDR = data;
+	USISR &= 0xf0;
+	while (!(USISR&(1<<USIOIF)))
 	{
-		valid &= i2cWriteLoop(data);
+		USICR |= (1<<USITC);
+		_delay_us(2);
 	}
-	BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
-	_delay_loop_1(2);
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
-	_delay_loop_1(2);
-	BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-	_delay_loop_1(2);
-	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // Stop Bit
-	return valid;
+	USIDR = 0xff;
+	USISR |= (1<<USIOIF);
 }
 
-bool MCP7940n::i2cRead(uint8_t address, uint8_t& data)
+inline uint8_t MCP7940n::i2cRecive()
 {
-	data = 0;
-	bool valid = true;
-	valid &= i2cWrite(address, 0xff);
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
-	_delay_loop_1(2);
-	valid &= i2cWriteLoop(ADR_READ);
-	i2cReadLoop(data, false);
-	BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
-	_delay_loop_1(2);
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
-	_delay_loop_1(2);
-	BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-	_delay_loop_1(2);
-	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); //Stop Bit
-	return valid;
-}
-/*
-bool MCP7940n::i2cWriteConcecutive(uint8_t address, uint8_t data1, uint8_t data2, uint8_t data3)
-{
-<<<<<<< HEAD
-BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
-bool valid = true;
-_delay_loop_1(2);
-valid &= i2cWriteLoop(ADR_WRITE);
-valid &= i2cWriteLoop(address);
-valid &= i2cWriteLoop(data1);
-valid &= i2cWriteLoop(data2);
-valid &= i2cWriteLoop(data3);
-BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
-_delay_loop_1(2);
-BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
-_delay_loop_1(2);
-BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-_delay_loop_1(2);
-BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // Stop Bit
-return valid;
-=======
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
-	bool valid = true;
-	_delay_loop_1(2);
-	valid &= i2cWriteLoop(ADR_WRITE);
-	valid &= i2cWriteLoop(address);
-	valid &= i2cWriteLoop(data1);
-	valid &= i2cWriteLoop(data2);
-	valid &= i2cWriteLoop(data3);
-	BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
-	_delay_loop_1(2);
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
-	_delay_loop_1(2);
-	BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-	_delay_loop_1(2);
-	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // Stop Bit
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+	uint8_t dat;
+	USIDR = 0xff;
+	USISR &= 0xf0;
+	while (!(USISR&(1<<USIOIF)))
+	{
+		USICR |= (1<<USITC);
+		_delay_us(2);
+	}
+	dat = USIDR;
+	USIDR = 0xff;
+	USISR |= (1<<USIOIF);
+	return dat;
 }
 
-bool MCP7940n::i2cReadConcecutive(uint8_t address, uint8_t& data1, uint8_t& data2, uint8_t& data3)
+
+inline void MCP7940n::i2cStart()
 {
-<<<<<<< HEAD
-data1 = 0;
-data2 = 0;
-data3 = 0;
-bool valid = true;
-valid &= i2cWrite(address, 0xff);
-_delay_loop_1(2);
-BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
-valid &= i2cWriteLoop(ADR_READ);
-i2cReadLoop(data1, true);
-i2cReadLoop(data2, true);
-i2cReadLoop(data3, false);
-BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
-_delay_loop_1(2);
-BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
-_delay_loop_1(2);
-BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-_delay_loop_1(2);
-BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); //Stop Bit
-return valid;
-=======
-	data1 = 0;
-	data2 = 0;
-	data3 = 0;
-	bool valid = true;
-	valid &= i2cWrite(address, 0xff);
-	_delay_loop_1(2);
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN); // Start Bit, Data Line Sourced Low
-	valid &= i2cWriteLoop(ADR_READ);
-	i2cReadLoop(data1, true);
-	i2cReadLoop(data2, true);
-	i2cReadLoop(data3, false);
-	BIT_OFF(I2C_PORT_GROUP, I2C_CLOCK_PIN); // Stop Sequence starts from here.
-	_delay_loop_1(2);
-	BIT_ON(I2C_DATA_GROUP, I2C_DATA_PIN);
-	_delay_loop_1(2);
-	BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-	_delay_loop_1(2);
-	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); //Stop Bit
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+	DDRB |= 0b10100000;
+	PORTB |= 0b00100000;
+	PORTB &= 0xdf;
+	_delay_us(2);
+	USICR |= (1<<USITC);
+	_delay_us(2);
+	PORTB |= 0x20;
 }
-*/
-inline bool MCP7940n::i2cReadRoutine(uint8_t address, int8_t& data)
+
+inline void MCP7940n::i2cEnd()
+{
+	PORTB &= 0xdf;
+	_delay_us(2);
+	USICR |= (1<<USITC);
+	_delay_us(2);
+	PORTB |= 0x20;
+	_delay_us(2);
+}
+
+inline void MCP7940n::i2cAck()
+{
+	USICR |= (1<<USITC);
+	_delay_us(2);
+	USICR |= (1<<USITC);
+	_delay_us(2);
+}
+
+inline void MCP7940n::i2cAck(bool b)
+{
+	PORTB &= 0xdf;
+	_delay_us(2);
+	USICR |= (1<<USITC);
+	_delay_us(2);
+	USICR |= (1<<USITC);
+	_delay_us(2);
+	PORTB |= 0x20;
+}
+
+void MCP7940n::rtcReadRoutine(uint8_t address, int8_t& data)
 {
 	uint8_t temp = 0;
-	bool valid = i2cRead(address, temp);
+	i2cRead(address, temp);
 	if(address == RTCHOUR)
 	{
 		temp &= 0x3f;
 	}
 	temp = bcd2dec(temp);
 	data = temp;
-	return valid;
 }
 
-inline bool MCP7940n::i2cWriteRoutine(uint8_t address, int8_t data)
+void MCP7940n::rtcWriteRoutine(uint8_t address, int8_t data)
 {
-	data = dec2bcd(data);
+	uint8_t temp = dec2bcd(data);
 	if (address == RTCHOUR)
 	{
-		data &= 0x3f;
+		temp &= 0x3f;
 	}
 	if (address == RTCSEC)
 	{
-		data |= 0x80;
+		temp |= 0x80;
+		//data &= 0x7f;
+		//DS1307
 	}
-	return i2cWrite(address, data);
-}
-/*
-bool MCP7940n::loadSec()
-{
-<<<<<<< HEAD
-bool valid = true;
-cli();
-valid &= i2cReadRoutine(RTCSEC, secs);
-sei();
-return valid;
-=======
-	bool valid = true;
-	cli();
-	valid &= i2cReadRoutine(RTCSEC, secs);
-	sei();
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+	i2cWrite(address, temp);
 }
 
-bool MCP7940n::loadMin()
+inline void MCP7940n::rtcReadRoutineAll(int8_t& h,int8_t& m,int8_t& s)
 {
-<<<<<<< HEAD
-bool valid = true;
-cli();
-valid &= i2cReadRoutine(RTCMIN, mins);
-sei();
-return valid;
-=======
-	bool valid = true;
-	cli();
-	valid &= i2cReadRoutine(RTCMIN, mins);
-	sei();
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+	i2cStart();
+	i2cSend(ADR_WRITE);
+	i2cAck();
+	i2cSend(RTCSEC);
+	i2cAck();
+	i2cEnd();
+	
+	i2cStart();
+	i2cSend(ADR_READ);
+	i2cAck();
+	s = i2cRecive();
+	i2cAck(true);
+	m = i2cRecive();
+
+	i2cAck(true);
+	h = i2cRecive();
+	i2cAck();
+	i2cEnd();
+	
+	h &= 0x3f;
+	s = bcd2dec(s);
+	m = bcd2dec(m);
+	h = bcd2dec(h);
 }
 
-bool MCP7940n::loadHour()
+void MCP7940n::loadTime()
 {
-<<<<<<< HEAD
-bool valid = true;
-cli();
-valid &= i2cReadRoutine(RTCHOUR, hours);
-sei();
-return valid;
-=======
-	bool valid = true;
-	cli();
-	valid &= i2cReadRoutine(RTCHOUR, hours);
-	sei();
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+	DDRB |= 0b10100000;
+	PORTB |= 0b00100000;
+	/*rtcReadRoutine(RTCSEC, secs);
+	rtcReadRoutine(RTCMIN, mins);
+	rtcReadRoutine(RTCHOUR, hours);*/
+	rtcReadRoutineAll(hours, mins, secs);
 }
 
-bool MCP7940n::saveSec()
+void MCP7940n::saveTime(bool secT)
 {
-<<<<<<< HEAD
-bool valid = true;
-cli();
-valid &= i2cWriteRoutine(RTCSEC, secs);
-sei();
-return valid;
-=======
-	bool valid = true;
-	cli();
-	valid &= i2cWriteRoutine(RTCSEC, secs);
-	sei();
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+	DDRB |= 0b10100000;
+	PORTB |= 0b00100000;
+	if (secT)
+	{
+		rtcWriteRoutine(RTCSEC, secs);
+	}
+	else
+	{
+		rtcWriteRoutine(RTCSEC, 0);
+	}
+	rtcWriteRoutine(RTCMIN, mins);
+	rtcWriteRoutine(RTCHOUR, hours);
 }
 
-bool MCP7940n::saveMin()
+void MCP7940n::saveTime()
 {
-<<<<<<< HEAD
-bool valid = true;
-cli();
-valid &= i2cWriteRoutine(RTCMIN, mins);
-sei();
-return valid;
-=======
-	bool valid = true;
-	cli();
-	valid &= i2cWriteRoutine(RTCMIN, mins);
-	sei();
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
-}
-
-bool MCP7940n::saveHour()
-{
-<<<<<<< HEAD
-bool valid = true;
-cli();
-valid &= i2cWriteRoutine(RTCHOUR, hours);
-sei();
-return valid;
-=======
-	bool valid = true;
-	cli();
-	valid &= i2cWriteRoutine(RTCHOUR, hours);
-	sei();
-	return valid;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
-}
-*/
-bool MCP7940n::loadTime()
-{
-	bool valid = true;
-	cli();
-	valid &= i2cReadRoutine(RTCSEC, secs);
-	valid &= i2cReadRoutine(RTCMIN, mins);
-	valid &= i2cReadRoutine(RTCHOUR, hours);
-	sei();
-	return valid;
-}
-
-
-bool MCP7940n::saveTime()
-{
-	cli();
-	bool valid = true;
-	valid &= i2cWriteRoutine(RTCHOUR, hours);
-	valid &= i2cWriteRoutine(RTCMIN, mins);
-	valid &= i2cWriteRoutine(RTCSEC, 0);
-	sei();
-	return valid;
+	DDRB |= 0b10100000;
+	PORTB |= 0b00100000;
+	rtcWriteRoutine(RTCSEC, 0);
+	rtcWriteRoutine(RTCMIN, mins);
+	rtcWriteRoutine(RTCHOUR, hours);
 }
 
 MCP7940n::MCP7940n() : ClockWorks(0,0,0,0)
 {
-	BIT_ON(I2C_DATA_GROUP, I2C_CLOCK_PIN);
-	BIT_OFF(I2C_DATA_GROUP, I2C_DATA_PIN); // Clock Line Sourced High
-	BIT_ON(I2C_PORT_GROUP, I2C_CLOCK_PIN);
-	BIT_OFF(I2C_PORT_GROUP, I2C_DATA_PIN); // DATA Line Pulled High
+	//PB5 - SDA, PB7 -SCK
+	cli();
+	DDRB |= 0b10100000;
+	PORTB |= 0b00100000;
+	USICR = (1<<USIWM1)|(1<<USICS1)|(1<<USICLK);
+	USICR |= (1<<USITC);
 	loadTime();
-	i2cWriteRoutine(RTCSEC, 0);
-	i2cWrite(RTCWKDAY, 0x08); // Enable Backup battery
+	//enableOscillator();
+	enableBattery();
+	sei();
 }
+

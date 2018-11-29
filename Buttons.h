@@ -2,49 +2,31 @@
 *	Buttons.h
 *
 *	Created: 2018-06-26 오전 8:26:47
+*	Modified 2018-11-19 for Attiny 4313
 *	Author: Cakeng (PARK JONG SEOK)
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
-<<<<<<< HEAD
 *	use, modify, or share the software for any purpose
 *	other than personal use.
-=======
-*	use, modify, or share the software for any purpose.
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
+
 #ifndef _BUTTONS_CAKENG_H
 #define _BUTTONS_CAKENG_H
 #include <avr/io.h>
 #include "Basic.h"
 
-#define BUTTON_UP_PRESSED			1
+#define BUTTON_UP_PRESSED		1
 #define BUTTON_DOWN_PRESSED	    2
-#define BUTTON_ALARM_PRESSED		3
+#define BUTTON_ALARM_PRESSED	3
 #define BUTTON_UP_UNPRESSED	    4
 #define BUTTON_DOWN_UNPRESSED	5
 #define BUTTON_ALARM_UNPRESSED	6
 #define BUTTON_UNDER_TICKS		7
 #define NULL 0
 
-<<<<<<< HEAD
-#ifndef	BUTTON_INPUT_UP
-=======
-#ifndef	BUTTON_INPUT_UP   
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
-#define BUTTON_INPUT_UP                PINA5
-#define BUTTON_INPUT_DOWN			PINA6
-#define BUTTON_INPUT_ALARM			PINA7
-#define BUTTON_INPUT_UP_PORT_GROUP  PINA
-#define BUTTON_INPUT_UP_DATA_GROUP  DDRA
-#define BUTTON_INPUT_DOWN_PORT_GROUP  PINA
-#define BUTTON_INPUT_DOWN_DATA_GROUP  DDRA
-#define BUTTON_INPUT_ALARM_PORT_GROUP  PINA
-#define BUTTON_INPUT_ALARM_DATA_GROUP  DDRA
-#endif
-
-
+// Button 1 - PB6, Button 2 - PB5, Button 3 - PB4
 
 class Buttons
 {

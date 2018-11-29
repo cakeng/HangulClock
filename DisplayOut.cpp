@@ -2,16 +2,13 @@
 *	DisplayOut.cpp
 *
 *	Created: 2018-07-10 오전 6:43:41
+*	Modified 2018-11-19 for Attiny 4313
 *	Author: Cakeng (PARK JONG SEOK)
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
-<<<<<<< HEAD
 *	use, modify, or share the software for any purpose
 *	other than personal use.
-=======
-*	use, modify, or share the software for any purpose.
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
 
@@ -20,40 +17,40 @@
 uint16_t hourData[12][2] =
 {
 	{
-		0b0000000000010100,
-		0b0000000000001000
+		0b0000000000000101,
+		0b0000000000000010
 	},//12
 	{
-		0b0000000000001000,
-		0b0000000000001000
+		0b0000000000000010,
+		0b0000000000000010
 	},//1
 	{
-		0b0000000000010000,
-		0b0000000000001000
+		0b0000000000000001,
+		0b0000000000000010
 	},//2
 	{
-		0b0000000000000001,
-		0b0000000000001000
+		0b0000000000010000,
+		0b0000000000000010
 	},//3
 	{
 		0b0000000010000000,
-		0b0000000000001000
+		0b0000000000000010
 	},//4
 	{
-		0b0000000001000010,
-		0b0000000000001000
+		0b0000000100001000,
+		0b0000000000000010
 	},//5
 	{
-		0b0000000001100000,
-		0b0000000000001000
+		0b0000001100000000,
+		0b0000000000000010
 	},//6
 	{
-		0b0000001100000000,
-		0b0000000000001000
+		0b0000000001100000,
+		0b0000000000000010
 	},//7
 	{
-		0b0000000000100000,
-		0b0000000000001001
+		0b0000001000000000,
+		0b0000000000010010
 	},//8
 	{
 		0b0000000000000000,
@@ -61,42 +58,32 @@ uint16_t hourData[12][2] =
 	},//9
 	{
 		0b0000000000000100,
-		0b0000000000001000
+		0b0000000000000010
 	},//10
 	{
-		0b0000000000001100,
-		0b0000000000001000
+		0b0000000000000110,
+		0b0000000000000010
 	}//11
 };
 
-uint16_t min1Data[10] =
+uint16_t minData[11] =
 {
-	0b0100000000000000,//0
-	0b0000000000010000,//1
-	0b0000000000100000,//2
-	0b0000000001000000,//3
-	0b0000010000000000,//4
-	0b0000100000000000,//5
-	0b0000000100000000,//6
-	0b0000001000000000,//7
+	0b0000010000000000,//0
+	0b0000000000000001,//1
+	0b0000001000000000,//2
+	0b0000000100000000,//3
+	0b0100000000000000,//4
+	0b0010000000000000,//5
+	0b0000000001000000,//6
+	0b0000000000100000,//7
 	0b0001000000000000,//8
-	0b0010000000000000//9
+	0b0000100000000000,//9
+	0b0000000010000000//10
 };
 
-uint16_t min10Data[5] =
-{
-	0b0000000010000000,//1
-	0b0000000010100000,//2
-	0b0000000011000000,//3
-	0b0000010010000000,//4
-	0b0000100010000000//5
-};
 
-<<<<<<< HEAD
 uint16_t heartData[2] =
-=======
-uint16_t heartData[2] = 
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+
 {
 	0b0000000101000000,
 	0b0001000101010101
@@ -105,63 +92,51 @@ uint16_t heartData[2] =
 
 DisplayOut::DisplayOut(uint8_t cons)
 {
-	BIT_ON(SHIFTOUT_DATA_GROUP, SHIFTOUT_SERIAL_CLOCK_PIN);
-	BIT_ON(SHIFTOUT_DATA_GROUP, SHIFTOUT_SERIAL_DATA_PIN);
-	BIT_ON(SHIFTOUT_DATA_GROUP, SHIFTOUT_SERIAL_LATCH_PIN);
-	BIT_ON(SHIFTOUT_DATA_GROUP, SHIFTOUT_ROW1);
-	BIT_ON(SHIFTOUT_DATA_GROUP, SHIFTOUT_ROW2);
-	//DDRA = 0b00111000;
+	PORTD &= 0b11100000; //Turn off columns. (NPN)
+	PORTD |= 0b01100000;
+	PORTB |= 0b00000111; //Turn off rows. (PNP)
 	screenBuffer[0] = 0;
 	screenBuffer[1] = 0;
 	rowNum = 0;
 	shiftOutBuffer = 0;
 	flashHour = false;
-	min1Out = false;
-	brightness = 0;
-	shiftOut(0x07);
-	BIT_ON(SHIFTOUT_PORT_GROUP, SHIFTOUT_ROW1);
-	BIT_ON(SHIFTOUT_PORT_GROUP, SHIFTOUT_ROW2);
+	minNum = 0;
+	brightness = 5;
 }
 
-void DisplayOut::shiftOut(uint8_t data)
-{
-	BIT_OFF(SHIFTOUT_PORT_GROUP, SHIFTOUT_SERIAL_LATCH_PIN);
-	for(uint8_t i = 8; 0 < i; i--)
-	{
-		BIT_OFF(SHIFTOUT_PORT_GROUP, SHIFTOUT_SERIAL_CLOCK_PIN);
-		
-		BIT_OFF(SHIFTOUT_PORT_GROUP, SHIFTOUT_SERIAL_DATA_PIN);
-		SHIFTOUT_PORT_GROUP |= (((data>>(i-1))&1)<<SHIFTOUT_SERIAL_DATA_PIN);
-		
-		BIT_ON(SHIFTOUT_PORT_GROUP, SHIFTOUT_SERIAL_CLOCK_PIN);
-	}
-	BIT_ON(SHIFTOUT_PORT_GROUP, SHIFTOUT_SERIAL_LATCH_PIN);
-}
 
 void DisplayOut::refreshDisplay()
 {
-	shiftOut(0x07);
-	BIT_ON(SHIFTOUT_PORT_GROUP, SHIFTOUT_ROW1);
-	BIT_ON(SHIFTOUT_PORT_GROUP, SHIFTOUT_ROW2);
-	shiftOutBuffer = 0x07;
-	if (rowNum - brightness == 0)
-	{
-		BIT_OFF(SHIFTOUT_PORT_GROUP, SHIFTOUT_ROW1);
-		shiftOutBuffer |= ((screenBuffer[0]&0x1F)<<3);
-	}
-	else if (rowNum - brightness == 1)
-	{
-		BIT_OFF(SHIFTOUT_PORT_GROUP, SHIFTOUT_ROW2);
-		shiftOutBuffer |= (((screenBuffer[0]>>5)&0x1F)<<3);
-	}
-	else if(rowNum - brightness > 1)
-	{
-		shiftOutBuffer &= ~(1<<(rowNum - brightness - 2));
-		shiftOutBuffer |= (((screenBuffer[1]>>(5*(rowNum - brightness - 2)))&0x1F)<<3);
-	}
-	shiftOut(shiftOutBuffer);
+	PORTD &= 0b11100000; //Turn off columns. (NPN)
+	PORTD |= 0b01100000;
+	PORTB |= 0b00000111; //Turn off rows. (PNP)
 	rowNum++;
-	if (rowNum - brightness == 5)
+	if (rowNum == 1)
+	{
+		PORTB &= 0b11111011; // Turn on row 1 
+		PORTD |= (uint8_t)(screenBuffer[0]&0x001f); //Turn on columns.
+	}
+	else if (rowNum == 2)
+	{
+		PORTB &= 0b11111101; // Turn on row 2 
+		PORTD |= (uint8_t)((screenBuffer[0]>>5)&0x001f);
+	}
+	else if (rowNum == 3)
+	{
+		PORTB &= 0b11111110; // Turn on row 3 
+		PORTD |= (uint8_t)(screenBuffer[1]&0x001f);
+	}
+	else if (rowNum == 4)
+	{
+		PORTD &= 0b10111111; // Turn on row 4 
+		PORTD |= (uint8_t)((screenBuffer[1]>>5)&0x001f);
+	}
+	else if (rowNum == 5)
+	{
+		PORTD &= 0b11011111; // Turn on row 5 
+		PORTD |= (uint8_t)((screenBuffer[1]>>10)&0x001f);
+	}
+	else if (rowNum > brightness)
 	{
 		rowNum = 0;
 	}
@@ -169,18 +144,12 @@ void DisplayOut::refreshDisplay()
 
 void DisplayOut::flashDisplay()
 {
+
 	static uint8_t ticks = 0;
 	ticks++;
-	if(ticks > 1)
+	if(ticks > 14)
 	{
-		if (min1Out)
-		{
-			min1Out = false;
-		}
-		else
-		{
-			min1Out = true;
-		}
+		minNum++;
 		if (hourOut)
 		{
 			hourOut = false;
@@ -193,7 +162,7 @@ void DisplayOut::flashDisplay()
 	}
 }
 
-/*
+
 void DisplayOut::setDisplay(uint8_t * arr)
 {
 screenBuffer[0] = (arr[0]&0x1f);
@@ -208,7 +177,7 @@ void DisplayOut::setDisplay(uint16_t data1, uint16_t data2)
 screenBuffer[0] = data1;
 screenBuffer[1] = data2;
 }
-*/
+
 
 void DisplayOut::setDisplay(ClockWorks& clockObj)
 {
@@ -221,53 +190,129 @@ void DisplayOut::setDisplay(ClockWorks& clockObj)
 		screenBuffer[0] = 0;
 	}
 	
+	
 	if (clockObj.getMin() == 0)
 	{
 		screenBuffer[1] = hourData[clockObj.getHour()%12][1];
 	}
 	else if (clockObj.getMin()/10 == 0)
 	{
-		screenBuffer[1] = hourData[clockObj.getHour()%12][1]|min1Data[clockObj.getMin()%10]|min1Data[0];
+		screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[clockObj.getMin()]|minData[0];
 	}
 	else if (clockObj.getMin()%10 == 0)
 	{
-		screenBuffer[1] = hourData[clockObj.getHour()%12][1]|min10Data[clockObj.getMin()/10 - 1]|min1Data[0];
-	}
-	else
-	{
-		if (min1Out)
+		if (clockObj.getMin()/10 == 1)
 		{
-			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|min1Data[clockObj.getMin()%10]|min1Data[0];
-
+			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[10]|minData[0];
 		}
 		else
 		{
-			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|min10Data[clockObj.getMin()/10 - 1];
-
+			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[clockObj.getMin()/10]|minData[10]|minData[0];
 		}
 	}
+	else
+	{
+		if (minNum == 0)
+		{
+			if (clockObj.getMin()/10 == 1)
+			{
+				screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[10];
+			}
+			else
+			{
+				screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[clockObj.getMin()/10]|minData[10];
+			}
+		}
+		if (minNum == 1)
+		{
+			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[clockObj.getMin()%10]|minData[0];
+		}
+		else
+		{
+			minNum = 0;
+		}
+	}
+	
+	
+	/*
+	if (minNum == 0)
+	{
+		if (clockObj.getMin()/10 < 2)
+		{
+			minNum++;
+		}
+		else
+		{
+			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[clockObj.getMin()/10];
+		}
+	}
+	if (minNum == 1)
+	{
+		if (clockObj.getMin()/10 == 0)
+		{
+			minNum++;
+		}
+		else
+		{
+			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[10];
+		}
+	}
+	if (minNum == 2)
+	{
+		screenBuffer[1] = hourData[clockObj.getHour()%12][1];
+		minNum++;
+	}
+	if (minNum == 3)
+	{
+		if (clockObj.getMin()%10 == 0)
+		{
+			minNum++;
+		}
+		else
+		{
+			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[clockObj.getMin()%10];
+		}
+	}
+	if (minNum == 4)
+	{
+		if (clockObj.getMin() != 0)
+		{
+			screenBuffer[1] = hourData[clockObj.getHour()%12][1]|minData[0];
+		}
+	}
+	if (minNum == 6)
+	{
+		screenBuffer[1] = hourData[clockObj.getHour()%12][1];
+		minNum = 0;
+	}
+	if (minNum == 7)
+	{
+		screenBuffer[1] = hourData[clockObj.getHour()%12][1];
+		minNum = 0;
+	}
+	*/
 }
 
 void DisplayOut::setDisplayBin(ClockWorks& clockObj)
 {
-<<<<<<< HEAD
+
 	screenBuffer[0] = clockObj.getHour()&0x1F;
 	screenBuffer[0] |= ((clockObj.getMin()/10)&0x1F)<<5;
 	screenBuffer[1] = ((clockObj.getMin()%10)&0x1F);
 	screenBuffer[1] |= ((clockObj.getSec()/10)&0x1F)<<5;
 	screenBuffer[1] |= ((clockObj.getSec()%10)&0x1F)<<10;
-=======
-screenBuffer[0] = clockObj.getHour()&0x1F;
-screenBuffer[0] |= ((clockObj.getMin()/10)&0x1F)<<5;
-screenBuffer[1] = ((clockObj.getMin()%10)&0x1F);
-screenBuffer[1] |= ((clockObj.getSec()/10)&0x1F)<<5;
-screenBuffer[1] |= ((clockObj.getSec()%10)&0x1F)<<10;
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
+
+	screenBuffer[0] = clockObj.getHour()&0x1F;
+	screenBuffer[0] |= ((clockObj.getMin()/10)&0x1F)<<5;
+	screenBuffer[1] = ((clockObj.getMin()%10)&0x1F);
+	screenBuffer[1] |= ((clockObj.getSec()/10)&0x1F)<<5;
+	screenBuffer[1] |= ((clockObj.getSec()%10)&0x1F)<<10;
+
 }
 
 void DisplayOut::setDisplayHeart()
 {
-	if (min1Out)
+	if (minNum)
 	{
 		screenBuffer[0] = heartData[0];
 		screenBuffer[1] = heartData[1];

@@ -6,12 +6,8 @@
 *
 *	NO LICENCE INCLUDED
 *	Contact cakeng@naver.com to
-<<<<<<< HEAD
 *	use, modify, or share the software for any purpose
 *	other than personal use.
-=======
-*	use, modify, or share the software for any purpose.
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 *
 */
 #include "Buttons.h"
@@ -19,16 +15,18 @@
 
 void Buttons::checkInputs()
 {
+	DDRB &= 0b10001111;
+	PORTB &= 0b10001111;
 	buttonPressed = NULL;
-	if(!BIT_CHECK(BUTTON_INPUT_UP_PORT_GROUP, BUTTON_INPUT_UP))
+	if(!(PINB&(1<<PORTB6)))
 	{
 		buttonPressed = BUTTON_UP_PRESSED;
 	}
-	else if(!BIT_CHECK(BUTTON_INPUT_DOWN_PORT_GROUP, BUTTON_INPUT_DOWN))
+	else if(!(PINB&(1<<PORTB5)))
 	{
 		buttonPressed = BUTTON_DOWN_PRESSED;
 	}
-	else if(!BIT_CHECK(BUTTON_INPUT_ALARM_PORT_GROUP, BUTTON_INPUT_ALARM))
+	else if(!(PINB&(1<<PORTB4)))
 	{
 		buttonPressed = BUTTON_ALARM_PRESSED;
 	}
@@ -44,6 +42,8 @@ Buttons::Buttons(uint16_t tickFreq, bool pinOn) //Ticks to reach 1 second.
 	buttonCounter = 0;
 	buttonPressed = NULL;
 	buttonLast = NULL;
+	DDRB &= 0b10001111;
+	PORTB &= 0b10001111;
 }
 
 Buttons::Buttons(uint16_t tickFreq) //Ticks to reach 1 second.
@@ -56,9 +56,8 @@ Buttons::Buttons(uint16_t tickFreq) //Ticks to reach 1 second.
 	buttonCounter = 0;
 	buttonPressed = NULL;
 	buttonLast = NULL;
-	BIT_OFF(BUTTON_INPUT_UP_DATA_GROUP, BUTTON_INPUT_UP);
-	BIT_OFF(BUTTON_INPUT_DOWN_DATA_GROUP, BUTTON_INPUT_DOWN);
-	BIT_OFF(BUTTON_INPUT_ALARM_DATA_GROUP, BUTTON_INPUT_ALARM);
+	DDRB &= 0b10001111;
+	PORTB &= 0b10001111;
 }
 
 void Buttons::buttonFunction()
@@ -83,11 +82,6 @@ void Buttons::buttonFunction()
 		}
 		return;
 	}
-<<<<<<< HEAD
-	
-=======
-				
->>>>>>> be5ce2b47a916e376bcfe0e026002c3cdaf2fabe
 	buttonCounter++;
 	if(buttonCounter > 24)
 	{
