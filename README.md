@@ -28,7 +28,7 @@ Korean Teenagers in Japan, and also many [ethnic Koreans in Japan](https://en.wi
 
 Although these teenagers are born and raised in Japan, they are **not** acknowledged as Japanese citizens in Japan, due to their ethnicity. 
 
-Korea Global Intelligence ([국인](http://www.global-intelligence.co.kr)) is a group of Korean students who help teenagers who want to learn more about their ethnic origins.
+Korea Global Intelligence ([국인](http://www.global-intelligence.co.kr)) is a group of Korean students who help these teenagers who want to learn more about their ethnic origins.
 
 **I'm not personally a part of the 국인 group**, but I volunteered to put my electronic & coding skills to a good cause.
 
